@@ -4,10 +4,10 @@ import { useState, lazy, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import ProgressBar from '@/components/ProgressBar'
+import ProgressBar from './ProgressBar'
 
-const Question = lazy(() => import('@/components/Question'))
-const Result = lazy(() => import('@/components/Result'))
+const Question = lazy(() => import('./Question'))
+const Result = lazy(() => import('./Result'))
 
 const quizSections = [
   {
@@ -122,13 +122,9 @@ const quizSections = [
   }
 ]
 
-export default function QuizPage() {
+export default function Quiz() {
   const [currentPage, setCurrentPage] = useState(0)
-  const [answers, setAnswers] = useState<string[]>(
-    new Array(
-      quizSections.reduce((acc, section) => acc + section.questions.length, 0)
-    ).fill('')
-  )
+  const [answers, setAnswers] = useState<string[]>(new Array(quizSections.reduce((acc, section) => acc + section.questions.length, 0)).fill(''))
   const [showResult, setShowResult] = useState(false)
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -191,15 +187,10 @@ export default function QuizPage() {
     }
   }
   
-  
 
   const resetQuiz = () => {
     setCurrentPage(0)
-    setAnswers(
-      new Array(
-        quizSections.reduce((acc, section) => acc + section.questions.length, 0)
-      ).fill('')
-    )
+    setAnswers(new Array(quizSections.reduce((acc, section) => acc + section.questions.length, 0)).fill(''))
     setShowResult(false)
     setAiAnalysis(null)
   }
@@ -207,8 +198,7 @@ export default function QuizPage() {
   const totalQuestions = quizSections.reduce((acc, section) => acc + section.questions.length, 0)
   const totalPages = Math.ceil(totalQuestions / 5)
   const currentSection = quizSections[Math.floor(currentPage / 2)]
-  const questionsOnPage = quizSections
-    .flatMap((s) => s.questions)
+  const questionsOnPage = quizSections.flatMap(s => s.questions)
     .slice(currentPage * 5, (currentPage + 1) * 5)
     .map((q, i) => ({ ...q, number: currentPage * 5 + i + 1 }))
 
@@ -216,9 +206,7 @@ export default function QuizPage() {
     <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 flex items-center justify-center px-4 py-12">
       <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden">
         <div className="p-8">
-          <h1 className="text-3xl font-bold text-center text-purple-600 mb-8">
-            Goomi Academy Talent Quiz
-          </h1>
+          <h1 className="text-3xl font-bold text-center text-purple-600 mb-8">Goomi Academy Talent Quiz</h1>
           <AnimatePresence mode="wait">
             {!showResult ? (
               <motion.div
@@ -229,9 +217,7 @@ export default function QuizPage() {
                 transition={{ duration: 0.3 }}
               >
                 <ProgressBar current={currentPage + 1} total={totalPages} />
-                <h2 className="text-2xl font-semibold mb-4 text-purple-600">
-                  {currentSection.title}
-                </h2>
+                <h2 className="text-2xl font-semibold mb-4 text-purple-600">{currentSection.title}</h2>
                 <Suspense fallback={<div>Loading questions...</div>}>
                   {questionsOnPage.map((question, index) => (
                     <Question
@@ -252,19 +238,13 @@ export default function QuizPage() {
                   >
                     <ChevronLeft className="mr-2 h-4 w-4" /> Previous
                   </Button>
-                  <Button
-                    onClick={handleNext}
+                  <Button 
+                    onClick={handleNext} 
                     className="flex items-center"
                     disabled={isLoading}
                   >
-                    {currentPage === totalPages - 1
-                      ? isLoading
-                        ? 'Analyzing...'
-                        : 'Submit'
-                      : 'Next'}
-                    {!isLoading && (
-                      <ChevronRight className="ml-2 h-4 w-4" />
-                    )}
+                    {currentPage === totalPages - 1 ? (isLoading ? 'Analyzing...' : 'Submit') : 'Next'} 
+                    {!isLoading && <ChevronRight className="ml-2 h-4 w-4" />}
                   </Button>
                 </div>
               </motion.div>
@@ -289,3 +269,4 @@ export default function QuizPage() {
     </div>
   )
 }
+
