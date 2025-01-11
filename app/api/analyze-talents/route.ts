@@ -17,15 +17,17 @@ export async function POST(req: Request) {
 
     // Construct the prompt
     const prompt = `
-      Based on the following quiz answers, analyze the child's talents and provide insights:
+      Based on the following quiz answers, provide a detailed and comprehensive analysis of the child's talents and strengths:
 
       ${answers.map((answer: string, index: number) => `Question ${index + 1}: ${answer}`).join('\n')}
 
-      Please provide:
-      1. A summary of the child's top 3 talent areas
-      2. Detailed analysis of each talent area
-      3. Suggestions for activities or resources to further develop these talents
-      4. Any additional insights or recommendations
+      Instructions for the analysis:
+      1. **Summary of the child's top 3 talent areas**: Write a detailed paragraph of at least 5-7 sentences explaining why these areas stand out, supported by examples or reasoning derived from the answers.
+      2. **In-depth analysis of each talent area**: For each talent area, write a full paragraph (8-10 sentences) discussing what the talent implies, how it reflects in the answers, and the potential benefits of developing it. Use descriptive language and provide examples or hypothetical scenarios to make the analysis more relatable.
+      3. **Suggestions for further development**: Provide at least 2 paragraphs with actionable advice, including specific activities, books, tools, or programs to nurture these talents. Explain how these suggestions align with the identified talents and why they are beneficial.
+      4. **Additional insights or patterns**: Conclude with a paragraph (at least 6-8 sentences) identifying any notable patterns, unique traits, or areas of potential growth. End with an encouraging and positive tone to inspire the child's development.
+
+      Make sure each paragraph is well-developed, cohesive, and elaborates on the points mentioned. The goal is to provide parents or educators with a thorough understanding of the child's abilities and actionable recommendations for growth.
     `
 
     // Set up AbortController for timeout
@@ -41,7 +43,7 @@ export async function POST(req: Request) {
             {
               role: 'system',
               content:
-                'You are an AI assistant specializing in child development and talent analysis. Provide insightful, encouraging, and actionable advice based on the quiz results.',
+                'You are an AI assistant specializing in child development and talent analysis. Provide long, detailed, and insightful advice based on the quiz results.',
             },
             { role: 'user', content: prompt },
           ],
