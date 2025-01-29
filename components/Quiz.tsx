@@ -1137,7 +1137,22 @@ export default function Quiz() {
   }
 
   const handleSubmit = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
+  
+    // Calculate score before sending the answers
+    let calculatedScore = 0;
+  
+    quizSections.forEach((section) => {
+      section.questions.forEach((question, index) => {
+        const globalIndex = quizSections.indexOf(section) * section.questions.length + index;
+        if (answers[globalIndex] === question.options[question.correctAnswer]) {
+          calculatedScore++;
+        }
+      });
+    });
+  
+    setScore(calculatedScore); // Update score state
+  
     try {
       const response = await fetch('/api/analyze-talents', {
         method: 'POST',
@@ -1145,33 +1160,24 @@ export default function Quiz() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ answers }),
-      })
+      });
   
-      // Parse response JSON
-      const data = await response.json()
+      const data = await response.json();
   
-      // Check if the response is OK
       if (!response.ok) {
-        // Use the `message` property if it exists, otherwise fallback to a generic error message
-        throw new Error(data.error || 'Failed to get AI analysis')
+        throw new Error(data.error || 'Failed to get AI analysis');
       }
   
-      setAiAnalysis(data.analysis)
-      setShowResult(true)
+      setAiAnalysis(data.analysis);
+      setShowResult(true);
     } catch (error) {
-      if (error instanceof Error) {
-        // Log and alert the error message
-        console.error('Error submitting quiz:', error)
-        alert(`Failed to get AI analysis: ${error.message}`)
-      } else {
-        // Handle unknown error types
-        console.error('An unknown error occurred:', error)
-        alert('An unknown error occurred. Please try again.')
-      }
+      console.error('Error submitting quiz:', error);
+      alert(`Failed to get AI analysis: ${(error as Error).message}`);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+  
 
   const resetQuiz = () => {
     setCurrentPage(0)
@@ -1240,15 +1246,14 @@ export default function Quiz() {
                 transition={{ duration: 0.3 }}
               >
                 <Suspense fallback={<div>Loading result...</div>}>
-                  {/* <Result score={score} totalQuestions={totalQuestions} onReset={resetQuiz} /> */}
-                  <Result analysis={aiAnalysis} onReset={resetQuiz} />
-                </Suspense>
+      <Result score={score} totalQuestions={totalQuestions} analysis={aiAnalysis} onReset={resetQuiz} />
+    </Suspense>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
         <div className="bg-purple-100 p-4 flex justify-center">
-          <img src="/goomi-mascot.svg" alt="Goomi the Penguin" className="w-24 h-24" />
+          <img src="/goomi.jpg" alt="Goomi the Penguin" className="w-24 h-24" />
         </div>
       </div>
     </div>
