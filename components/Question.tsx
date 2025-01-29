@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { Button } from '@/components/ui/button'
+import { motion } from "framer-motion"
+import { Button } from "@/components/ui/button"
 
 interface QuestionProps {
   question: {
@@ -7,7 +7,7 @@ interface QuestionProps {
     text: string
     options: string[]
   }
-  number: number;
+  number: number
   onAnswer: (answer: string) => void
   selectedAnswer: string
 }
@@ -20,11 +20,7 @@ export default function Question({ question, number, onAnswer, selectedAnswer }:
       </h3>
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         {question.options.map((option, index) => (
-          <motion.div
-            key={index}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-          >
+          <motion.div key={index} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
             <Button
               variant={selectedAnswer === option ? "default" : "outline"}
               className="w-full justify-start text-left"
