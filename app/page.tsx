@@ -283,7 +283,7 @@ export default function QuizPage() {
           </AnimatePresence>
         </div>
         <div className="bg-purple-100 p-4 flex justify-center">
-          <img src="/goomi-mascot.svg" alt="Goomi the Penguin" className="w-24 h-24" />
+          <img src="/Goomi.jpg" alt="Goomi the Penguin" className="w-24 h-24" />
         </div>
       </div>
     </div>
