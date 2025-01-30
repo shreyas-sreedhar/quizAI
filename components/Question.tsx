@@ -20,11 +20,21 @@ export default function Question({ question, number, onAnswer, selectedAnswer }:
       </h3>
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         {question.options.map((option, index) => (
-          <motion.div key={index} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+          <motion.div
+            key={index}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full"
+          >
             <Button
               variant={selectedAnswer === option ? "default" : "outline"}
-              className="w-full justify-start text-left"
+              className="w-full justify-start text-left break-words p-4 h-auto"
               onClick={() => onAnswer(option)}
+              style={{
+                wordWrap: "break-word",
+                whiteSpace: "normal",
+                minHeight: "50px", // Ensures even height for all buttons
+              }}
             >
               {option}
             </Button>
@@ -34,4 +44,3 @@ export default function Question({ question, number, onAnswer, selectedAnswer }:
     </div>
   )
 }
-

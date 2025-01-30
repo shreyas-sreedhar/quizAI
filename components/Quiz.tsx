@@ -1104,6 +1104,7 @@ interface QuizProps {
   onComplete: (answers: string[]) => Promise<void>
   isLoading: boolean
 }
+
 export default function Quiz() {
   const [currentPage, setCurrentPage] = useState(0)
   const [answers, setAnswers] = useState<string[]>(
@@ -1113,7 +1114,6 @@ export default function Quiz() {
   const [score, setScore] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
-
 
   const handleAnswer = (questionIndex: number, answer: string) => {
     const newAnswers = [...answers]
@@ -1129,7 +1129,7 @@ export default function Quiz() {
   }
 
   const handleNext = () => {
-    if (currentPage < totalPages - 1) {
+    if (currentPage < quizSections.length - 1) {
       setCurrentPage(currentPage + 1)
     } else {
       handleSubmit()
@@ -1137,22 +1137,21 @@ export default function Quiz() {
   }
 
   const handleSubmit = async () => {
-    setIsLoading(true);
-  
-    // Calculate score before sending the answers
-    let calculatedScore = 0;
-  
-    quizSections.forEach((section) => {
-      section.questions.forEach((question, index) => {
-        const globalIndex = quizSections.indexOf(section) * section.questions.length + index;
+    setIsLoading(true)
+
+    let calculatedScore = 0
+    quizSections.forEach((section, sectionIndex) => {
+      section.questions.forEach((question, questionIndex) => {
+        const globalIndex = quizSections
+          .slice(0, sectionIndex)
+          .reduce((acc, sec) => acc + sec.questions.length, 0) + questionIndex
         if (answers[globalIndex] === question.options[question.correctAnswer]) {
-          calculatedScore++;
+          calculatedScore++
         }
-      });
-    });
-  
-    setScore(calculatedScore); // Update score state
-  
+      })
+    })
+    setScore(calculatedScore)
+
     try {
       const response = await fetch('/api/analyze-talents', {
         method: 'POST',
@@ -1160,24 +1159,20 @@ export default function Quiz() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ answers }),
-      });
-  
-      const data = await response.json();
-  
+      })
+      const data = await response.json()
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to get AI analysis');
+        throw new Error(data.error || 'Failed to get AI analysis')
       }
-  
-      setAiAnalysis(data.analysis);
-      setShowResult(true);
+      setAiAnalysis(data.analysis)
+      setShowResult(true)
     } catch (error) {
-      console.error('Error submitting quiz:', error);
-      alert(`Failed to get AI analysis: ${(error as Error).message}`);
+      console.error('Error submitting quiz:', error)
+      alert(`Failed to get AI analysis: ${(error as Error).message}`)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
-  
+  }
 
   const resetQuiz = () => {
     setCurrentPage(0)
@@ -1186,10 +1181,8 @@ export default function Quiz() {
     setScore(0)
   }
 
-  const totalQuestions = quizSections.reduce((acc, section) => acc + section.questions.length, 0)
-  const totalPages = quizSections.length
   const currentSection = quizSections[currentPage]
-  const isReadingComprehension = currentSection.hasOwnProperty("passage")
+  const isReadingComprehension = !!currentSection.passage
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 flex items-center justify-center px-4 py-12">
@@ -1205,35 +1198,48 @@ export default function Quiz() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <ProgressBar current={currentPage + 1} total={totalPages} />
-                <h2 className="text-2xl font-semibold mb-4 text-purple-600">{currentSection.title}</h2>
+                <ProgressBar current={currentPage + 1} total={quizSections.length} />
+                <h2 className="text-2xl font-semibold mb-4 text-purple-600 flex items-center">
+            {isReadingComprehension ? (
+              <>
+                <span role="img" aria-label="book" className="mr-2">📖</span>
+                {currentSection.title}
+              </>
+            ) : (
+              <>
+                <span role="img" aria-label="puzzle" className="mr-2">🧩</span>
+                {currentSection.title}
+              </>
+            )}
+          </h2>
                 {isReadingComprehension && (
                   <Suspense fallback={<div>Loading passage...</div>}>
-                    <ReadingPassage passage={currentSection.passage} />
+                    <ReadingPassage passage={currentSection.passage!} />
                   </Suspense>
                 )}
                 <Suspense fallback={<div>Loading questions...</div>}>
-                  {currentSection.questions.map((question, index) => (
-                    <Question
-                      key={question.id}
-                      question={question}
-                      number={index + 1}
-                      onAnswer={(answer) => handleAnswer(index, answer)}
-                      selectedAnswer={answers[currentPage * currentSection.questions.length + index]}
-                    />
-                  ))}
+                  {currentSection.questions.map((question, index) => {
+                    const globalQuestionNumber = quizSections
+                      .slice(0, currentPage)
+                      .reduce((acc, section) => acc + section.questions.length, 0) + (index + 1)
+
+                    return (
+                      <Question
+                        key={question.id}
+                        question={question}
+                        number={globalQuestionNumber}
+                        onAnswer={(answer) => handleAnswer(index, answer)}
+                        selectedAnswer={answers[currentPage * currentSection.questions.length + index]}
+                      />
+                    )
+                  })}
                 </Suspense>
                 <div className="flex justify-between mt-8">
-                  <Button
-                    onClick={handlePrevious}
-                    disabled={currentPage === 0}
-                    variant="outline"
-                    className="flex items-center"
-                  >
+                  <Button onClick={handlePrevious} disabled={currentPage === 0} variant="outline" className="flex items-center">
                     <ChevronLeft className="mr-2 h-4 w-4" /> Previous
                   </Button>
                   <Button onClick={handleNext} className="flex items-center" disabled={isLoading}>
-                    {currentPage === totalPages - 1 ? (isLoading ? "Submitting..." : "Submit") : "Next"}
+                    {currentPage === quizSections.length - 1 ? (isLoading ? "Submitting..." : "Submit") : "Next"}
                     {!isLoading && <ChevronRight className="ml-2 h-4 w-4" />}
                   </Button>
                 </div>
@@ -1246,14 +1252,14 @@ export default function Quiz() {
                 transition={{ duration: 0.3 }}
               >
                 <Suspense fallback={<div>Loading result...</div>}>
-      <Result score={score} totalQuestions={totalQuestions} analysis={aiAnalysis} onReset={resetQuiz} />
-    </Suspense>
+                  <Result score={score} totalQuestions={quizSections.reduce((acc, section) => acc + section.questions.length, 0)} analysis={aiAnalysis} onReset={resetQuiz} />
+                </Suspense>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
         <div className="bg-purple-100 p-4 flex justify-center">
-          <img src="/goomi.jpg" alt="Goomi the Penguin" className="w-24 h-24" />
+          <img src="/Goomi.jpg" alt="Goomi the Penguin" className="w-24 h-24" />
         </div>
       </div>
     </div>
