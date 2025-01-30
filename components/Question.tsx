@@ -27,17 +27,19 @@ export default function Question({ question, number, onAnswer, selectedAnswer }:
             className="w-full"
           >
             <Button
-              variant={selectedAnswer === option ? "default" : "outline"}
-              className="w-full justify-start text-left break-words p-4 h-auto"
-              onClick={() => onAnswer(option)}
-              style={{
-                wordWrap: "break-word",
-                whiteSpace: "normal",
-                minHeight: "50px", // Ensures even height for all buttons
-              }}
-            >
-              {option}
-            </Button>
+  variant={selectedAnswer === option ? "default" : "outline"}
+  className="w-full justify-start text-left break-words p-4"
+  onClick={() => onAnswer(option)}
+  style={{
+    wordWrap: "break-word",
+    whiteSpace: "normal",
+    minHeight: "60px", // Ensures all buttons have at least this height
+    display: "flex", // Ensures proper alignment of text inside the button
+    alignItems: "center", // Vertically aligns text
+  }}
+>
+  {option}
+</Button>
           </motion.div>
         ))}
       </div>

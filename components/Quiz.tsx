@@ -1115,6 +1115,8 @@ export default function Quiz() {
   const [isLoading, setIsLoading] = useState(false)
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
 
+  const totalQuestions = quizSections.reduce((acc, section) => acc + section.questions.length, 0)
+
   const handleAnswer = (questionIndex: number, answer: string) => {
     const newAnswers = [...answers]
     const globalQuestionIndex = currentPage * 5 + questionIndex
@@ -1188,7 +1190,10 @@ export default function Quiz() {
     <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 flex items-center justify-center px-4 py-12">
       <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden">
         <div className="p-8">
-          <h1 className="text-3xl font-bold text-center text-purple-600 mb-8">Goomi Academy Quiz</h1>
+          <h1 className="text-3xl font-bold text-center text-purple-600 mb-4">Goomi Academy Quiz</h1>
+          
+        
+
           <AnimatePresence mode="wait">
             {!showResult ? (
               <motion.div
@@ -1200,18 +1205,18 @@ export default function Quiz() {
               >
                 <ProgressBar current={currentPage + 1} total={quizSections.length} />
                 <h2 className="text-2xl font-semibold mb-4 text-purple-600 flex items-center">
-            {isReadingComprehension ? (
-              <>
-                <span role="img" aria-label="book" className="mr-2">📖</span>
-                {currentSection.title}
-              </>
-            ) : (
-              <>
-                <span role="img" aria-label="puzzle" className="mr-2">🧩</span>
-                {currentSection.title}
-              </>
-            )}
-          </h2>
+                  {isReadingComprehension ? (
+                    <>
+                      <span role="img" aria-label="book" className="mr-2">📖</span>
+                      {currentSection.title}
+                    </>
+                  ) : (
+                    <>
+                      <span role="img" aria-label="puzzle" className="mr-2">🧩</span>
+                      {currentSection.title}
+                    </>
+                  )}
+                </h2>
                 {isReadingComprehension && (
                   <Suspense fallback={<div>Loading passage...</div>}>
                     <ReadingPassage passage={currentSection.passage!} />
@@ -1252,7 +1257,7 @@ export default function Quiz() {
                 transition={{ duration: 0.3 }}
               >
                 <Suspense fallback={<div>Loading result...</div>}>
-                  <Result score={score} totalQuestions={quizSections.reduce((acc, section) => acc + section.questions.length, 0)} analysis={aiAnalysis} onReset={resetQuiz} />
+                  <Result score={score} totalQuestions={totalQuestions} analysis={aiAnalysis} onReset={resetQuiz} />
                 </Suspense>
               </motion.div>
             )}

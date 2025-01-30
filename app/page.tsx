@@ -1,21 +1,52 @@
 'use client'
 
-import { useState, lazy, Suspense } from 'react'
 import { Button } from '@/components/ui/button'
-import Quiz from '@/components/Quiz'
+import { useRouter } from 'next/navigation'
+import ReactMarkdown from 'react-markdown'
 
-const Result = lazy(() => import('@/components/Result'))
+export default function QuizLandingPage() {
+  const router = useRouter()
 
-export default function QuizPage() {
+  const handleStartQuiz = () => {
+    router.push('/quiz') // Redirects to the quiz page
+  }
+
+  const description1 = `
+**Discover Your Child’s Hidden Talents with AI Analysis!**  
+Goomi Quiz is designed to evaluate your child's **critical thinking, reasoning, and comprehension skills** through a series of thoughtfully crafted **Logical Reasoning** and **Reading Comprehension** questions.
+  `
+
+  const description2 = `
+Our advanced **AI-powered analysis** provides **personalized insights** into your child's strengths and areas for growth, helping them unlock their full potential.
+  `
+
+  const description3 = `
+This quiz contains **100 questions** and takes approximately **1 hour and 30 minutes** to complete.
+  `
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 flex items-center justify-center px-4 py-12">
+      <div className="max-w-3xl w-full bg-white rounded-2xl shadow-lg p-8">
+        <h1 className="text-4xl font-bold text-center text-purple-600 mb-6">Welcome to the Goomi Academy Quiz!</h1>
+        
+        <ReactMarkdown className="text-lg text-gray-700 mb-4 text-center">
+          {description1}
+        </ReactMarkdown>
 
-     <Quiz />
-     
-      <footer className="mt-8 text-center text-sm text-purple-600">
-        <p>&copy; 2025 Goomi Academy. All rights reserved.</p>
-      </footer>
-    </main>
+        <ReactMarkdown className="text-lg text-gray-700 mb-6 text-center">
+          {description2}
+        </ReactMarkdown>
+
+        <p className="text-lg text-gray-700 mb-6 text-center">
+          This quiz contains <span className="font-bold text-purple-600">100 questions</span> and takes approximately <span className="font-bold text-purple-600">1 hour and 30 minutes</span>  to complete.
+        </p>
+
+        <div className="flex justify-center">
+          <Button className="px-6 py-3 text-lg" onClick={handleStartQuiz}>
+            Start Quiz
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }
