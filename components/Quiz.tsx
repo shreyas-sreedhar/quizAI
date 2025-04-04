@@ -1114,6 +1114,8 @@ export default function Quiz() {
   const [score, setScore] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
+  const [skills, setSkills] = useState<any[]>([])
+  const [goomiScore, setGoomiScore] = useState(0)
 
   const totalQuestions = quizSections.reduce((acc, section) => acc + section.questions.length, 0)
 
@@ -1167,6 +1169,15 @@ export default function Quiz() {
         throw new Error(data.error || 'Failed to get AI analysis')
       }
       setAiAnalysis(data.analysis)
+      if (data.skills && Array.isArray(data.skills)) {
+        setSkills(data.skills)
+      }
+      if (data.score) {
+        setGoomiScore(data.score)
+      } else {
+        const percentage = Math.round((calculatedScore / totalQuestions) * 100)
+        setGoomiScore(Math.round(percentage * 0.66))
+      }
       setShowResult(true)
     } catch (error) {
       console.error('Error submitting quiz:', error)
@@ -1257,7 +1268,14 @@ export default function Quiz() {
                 transition={{ duration: 0.3 }}
               >
                 <Suspense fallback={<div>Loading result...</div>}>
-                  <Result score={score} totalQuestions={totalQuestions} analysis={aiAnalysis} onReset={resetQuiz} />
+                  <Result 
+                    score={score} 
+                    totalQuestions={totalQuestions} 
+                    analysis={aiAnalysis} 
+                    onReset={resetQuiz}
+                    skills={skills}
+                    goomiScore={goomiScore}
+                  />
                 </Suspense>
               </motion.div>
             )}
